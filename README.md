@@ -1,4 +1,42 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Directory Structure Visualizer
+
+A modern, accessible web application for parsing and visualizing directory structures with interactive editing and export capabilities.
+
+## Features
+
+- **Multiple Input Formats**: Support for both Markdown and ASCII tree formats
+- **Interactive Visualization**: Expand/collapse folders, rename files and folders
+- **Export Options**: Export as PNG image or copy as formatted text
+- **Fully Accessible**: WCAG AA compliant with comprehensive keyboard navigation
+- **No Data Persistence**: All data is stored in memory only (cleared on refresh)
+
+## Accessibility Features
+
+This application is built with accessibility as a core requirement:
+
+### Keyboard Navigation
+- **Arrow Keys**: Navigate up/down through the tree structure
+- **Enter/Space**: Expand or collapse folders
+- **F2**: Enable editing mode for renaming
+- **Home/End**: Jump to first/last visible node
+- **Tab**: Navigate between interactive elements
+- **Escape**: Cancel editing mode
+
+### Screen Reader Support
+- Comprehensive ARIA labels on all interactive elements
+- Live regions for status updates and error messages
+- Semantic HTML structure with proper landmarks
+- Tree role with proper treeitem hierarchy
+
+### Visual Accessibility
+- WCAG AA compliant color contrast ratios
+- Focus indicators on all interactive elements
+- Clear visual feedback for hover and active states
+- Smooth transitions for expand/collapse (150-300ms)
+
+### Skip Navigation
+- Skip to main content link for keyboard users
+- Proper heading hierarchy for screen reader navigation
 
 ## Getting Started
 
