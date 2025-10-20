@@ -2,10 +2,16 @@
 
 import { useState, useEffect } from 'react';
 import { Button } from './ui/button';
-import { Download, Copy, Loader2, Check } from 'lucide-react';
+import { Download, Copy, Loader2, Check, Terminal, ChevronDown } from 'lucide-react';
 import { TreeNode } from '@/lib/types';
-import { exportAsImage, copyAsText, isClipboardAvailable } from '@/lib/export';
+import { exportAsImage, copyAsText, isClipboardAvailable, copyAsScript, ScriptType } from '@/lib/export';
 import { Alert, AlertDescription } from './ui/alert';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from './ui/dropdown-menu';
 
 interface ExportControlsProps {
   nodes: TreeNode[];
@@ -20,7 +26,9 @@ interface ExportControlsProps {
 export function ExportControls({ nodes, treeViewRef, disabled }: ExportControlsProps) {
   const [isExportingImage, setIsExportingImage] = useState(false);
   const [isCopying, setIsCopying] = useState(false);
+  const [isCopyingScript, setIsCopyingScript] = useState(false);
   const [copySuccess, setCopySuccess] = useState(false);
+  const [scriptCopySuccess, setScriptCopySuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [clipboardAvailable, setClipboardAvailable] = useState(true); // Default to true to avoid hydration mismatch
 
@@ -65,6 +73,29 @@ export function ExportControls({ nodes, treeViewRef, disabled }: ExportControlsP
       setError(message);
     } finally {
       setIsCopying(false);
+    }
+  };
+
+  const handleCopyScript = async (scriptType: ScriptType) => {
+    if (disabled || !nodes || nodes.length === 0) return;
+
+    setIsCopyingScript(true);
+    setError(null);
+    setScriptCopySuccess(false);
+
+    try {
+      await copyAsScript(nodes, scriptType);
+      setScriptCopySuccess(true);
+      
+      // Reset success message after 3 seconds
+      setTimeout(() => {
+        setScriptCopySuccess(false);
+      }, 3000);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Failed to copy script to clipboard';
+      setError(message);
+    } finally {
+      setIsCopyingScript(false);
     }
   };
 
@@ -124,6 +155,56 @@ export function ExportControls({ nodes, treeViewRef, disabled }: ExportControlsP
             </>
           )}
         </Button>
+
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button
+              disabled={disabled || !hasNodes || isCopyingScript || !clipboardAvailable}
+              variant="outline"
+              size="sm"
+              className="gap-2 transition-all duration-200 hover:shadow-md hover:scale-105 hover:bg-accent/80 hover:border-primary/30 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+              aria-label="Copy directory structure as shell script"
+            >
+              {isCopyingScript ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" aria-hidden="true" />
+                  <span className="hidden sm:inline">Copying...</span>
+                </>
+              ) : scriptCopySuccess ? (
+                <>
+                  <Check className="w-4 h-4 text-green-600 dark:text-green-400" aria-hidden="true" />
+                  <span className="hidden sm:inline text-green-600 dark:text-green-400">Copied!</span>
+                  <span className="sm:hidden text-green-600 dark:text-green-400">Copied</span>
+                </>
+              ) : (
+                <>
+                  <Terminal className="w-4 h-4" aria-hidden="true" />
+                  <span className="hidden sm:inline">Copy as Script</span>
+                  <span className="sm:hidden">Script</span>
+                  <ChevronDown className="w-3 h-3 ml-1" aria-hidden="true" />
+                </>
+              )}
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-48">
+            <DropdownMenuItem onClick={() => handleCopyScript('powershell')}>
+              <Terminal className="w-4 h-4 mr-2" />
+              PowerShell
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => handleCopyScript('cmd')}>
+              <Terminal className="w-4 h-4 mr-2" />
+              CMD (Batch)
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => handleCopyScript('bash')}>
+              <Terminal className="w-4 h-4 mr-2" />
+              Bash
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => handleCopyScript('zsh')}>
+              <Terminal className="w-4 h-4 mr-2" />
+              Zsh
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
 
       {error && (

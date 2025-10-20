@@ -6,9 +6,30 @@ A modern, accessible web application for parsing and visualizing directory struc
 
 - **Multiple Input Formats**: Support for both Markdown and ASCII tree formats
 - **Interactive Visualization**: Expand/collapse folders, rename files and folders
-- **Export Options**: Export as PNG image or copy as formatted text
+- **Export Options**: 
+  - Export as PNG image
+  - Copy as formatted text
+  - Copy as shell script (PowerShell, CMD, Bash, Zsh)
 - **Fully Accessible**: WCAG AA compliant with comprehensive keyboard navigation
 - **No Data Persistence**: All data is stored in memory only (cleared on refresh)
+
+## Export Features
+
+### Copy as Script
+
+The "Copy as Script" feature generates executable shell scripts that recreate your directory structure. Choose from:
+
+- **PowerShell**: For Windows PowerShell environments
+- **CMD (Batch)**: For Windows Command Prompt
+- **Bash**: For Linux, macOS, and WSL
+- **Zsh**: For macOS (default shell) and Linux with Zsh
+
+Each script will:
+1. Create all directories in the structure
+2. Create all files (empty files)
+3. Display a success message when complete
+
+Simply copy the script and run it in your terminal to recreate the directory structure.
 
 ## Accessibility Features
 
