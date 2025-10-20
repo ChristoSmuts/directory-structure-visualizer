@@ -9,12 +9,12 @@ import { TreeNode } from '@/lib/types';
 import { ArrowUp } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import { ThemeToggle } from '@/components/ThemeToggle';
 
 export default function Home() {
   const { state, setTree, toggleExpand, renameNode, deleteNode, selectNode } = useTreeState();
   const treeViewRef = useRef<HTMLDivElement>(null);
   const [showScrollTop, setShowScrollTop] = useState(false);
-  const [isHeaderShrunk, setIsHeaderShrunk] = useState(false);
 
   const handleParse = (nodes: TreeNode[]) => {
     setTree(nodes);
@@ -24,12 +24,10 @@ export default function Home() {
     }
   };
 
-  // Show/hide scroll to top button and shrink header based on scroll position
+  // Show/hide scroll to top button based on scroll position
   useEffect(() => {
     const handleScroll = () => {
-      const scrollY = window.scrollY;
-      setShowScrollTop(scrollY > 300);
-      setIsHeaderShrunk(scrollY > 100);
+      setShowScrollTop(window.scrollY > 300);
     };
 
     window.addEventListener('scroll', handleScroll);
@@ -52,28 +50,21 @@ export default function Home() {
 
       {/* Header */}
       <header 
-        className={cn(
-          'border-b border-border/50 bg-card/80 backdrop-blur-sm sticky top-0 z-10 shadow-sm',
-          'transition-all duration-300 ease-in-out',
-        )}
+        className="border-b border-border/50 bg-card/80 backdrop-blur-sm"
         role="banner"
       >
-        <div className={cn(
-          'container mx-auto px-4 transition-all duration-300 ease-in-out',
-          isHeaderShrunk ? 'py-2' : 'py-4 md:py-5 lg:py-6',
-        )}>
-          <h1 className={cn(
-            'font-bold text-foreground tracking-tight transition-all duration-300 ease-in-out',
-            isHeaderShrunk ? 'text-base md:text-lg' : 'text-xl md:text-3xl',
-          )}>
-            Directory Structure Visualizer
-          </h1>
-          <p className={cn(
-            'text-xs md:text-sm text-muted-foreground mt-1.5 transition-all duration-300 ease-in-out overflow-hidden',
-            isHeaderShrunk ? 'max-h-0 opacity-0 mt-0' : 'max-h-10 opacity-100',
-          )}>
-            Parse and visualize directory structures with interactive editing
-          </p>
+        <div className="container mx-auto px-4 py-4 md:py-5 lg:py-6">
+          <div className="flex items-start justify-between gap-4">
+            <div className="flex-1">
+              <h1 className="text-xl md:text-3xl font-bold text-foreground tracking-tight">
+                Directory Structure Visualizer
+              </h1>
+              <p className="text-xs md:text-sm text-muted-foreground mt-1.5">
+                Parse and visualize directory structures with interactive editing
+              </p>
+            </div>
+            <ThemeToggle />
+          </div>
         </div>
       </header>
 

@@ -257,7 +257,7 @@ export function TreeNode({
             <button
               onClick={handleDeleteConfirm}
               className={cn(
-                'p-1.5 rounded-md bg-destructive/10 hover:bg-destructive/20',
+                'p-1.5 rounded-md bg-destructive/10 hover:bg-destructive/20 cursor-pointer',
                 'focus:outline-none focus:ring-2 focus:ring-destructive/50',
                 'transition-colors duration-200',
               )}
@@ -271,7 +271,7 @@ export function TreeNode({
             <button
               onClick={handleDeleteCancel}
               className={cn(
-                'p-1.5 rounded-md hover:bg-accent-foreground/10',
+                'p-1.5 rounded-md hover:bg-accent-foreground/10 cursor-pointer',
                 'focus:outline-none focus:ring-2 focus:ring-ring/50',
                 'transition-colors duration-200',
               )}
@@ -299,7 +299,7 @@ export function TreeNode({
             <button
               onClick={handleEditClick}
               className={cn(
-                'opacity-0 group-hover:opacity-100 transition-opacity duration-200',
+                'opacity-0 group-hover:opacity-100 transition-opacity duration-200 cursor-pointer',
                 'p-1.5 rounded-md hover:bg-accent-foreground/10',
                 'focus:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring/50',
               )}
@@ -313,7 +313,7 @@ export function TreeNode({
             <button
               onClick={handleDeleteClick}
               className={cn(
-                'opacity-0 group-hover:opacity-100 transition-opacity duration-200',
+                'opacity-0 group-hover:opacity-100 transition-opacity duration-200 cursor-pointer',
                 'p-1.5 rounded-md hover:bg-destructive/10',
                 'focus:opacity-100 focus:outline-none focus:ring-2 focus:ring-destructive/50',
               )}
