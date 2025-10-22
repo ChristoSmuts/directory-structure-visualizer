@@ -38,7 +38,8 @@ export type TreeAction =
   | { type: 'TOGGLE_EXPAND'; payload: string }
   | { type: 'RENAME_NODE'; payload: { id: string; name: string } }
   | { type: 'DELETE_NODE'; payload: string }
-  | { type: 'SELECT_NODE'; payload: string | null };
+  | { type: 'SELECT_NODE'; payload: string | null }
+  | { type: 'ADD_NODE'; payload: { parentId: string; nodeType: 'file' | 'folder' } };
 
 /**
  * Result type for parsing operations

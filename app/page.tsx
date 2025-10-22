@@ -10,19 +10,30 @@ import { ArrowUp } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { ThemeToggle } from '@/components/ThemeToggle';
+import { formatTreeToText } from '@/lib/formatter';
 
 export default function Home() {
-  const { state, setTree, toggleExpand, renameNode, deleteNode, selectNode } = useTreeState();
+  const { state, setTree, toggleExpand, renameNode, deleteNode, selectNode, addNode } = useTreeState();
   const treeViewRef = useRef<HTMLDivElement>(null);
   const [showScrollTop, setShowScrollTop] = useState(false);
+  const [inputText, setInputText] = useState('');
 
-  const handleParse = (nodes: TreeNode[]) => {
+  const handleParse = (nodes: TreeNode[], text: string) => {
     setTree(nodes);
+    setInputText(text);
     // Auto-select first node for keyboard navigation
     if (nodes.length > 0) {
       selectNode(nodes[0].id);
     }
   };
+
+  // Update input text when tree changes (from add/rename/delete operations)
+  useEffect(() => {
+    if (state.nodes.length > 0) {
+      const formatted = formatTreeToText(state.nodes, { style: 'markdown' });
+      setInputText(formatted);
+    }
+  }, [state.nodes]);
 
   // Show/hide scroll to top button based on scroll position
   useEffect(() => {
@@ -75,7 +86,7 @@ export default function Home() {
           <section className="flex flex-col space-y-3 md:space-y-4" aria-labelledby="input-heading">
             <h2 id="input-heading" className="text-base md:text-lg font-semibold text-foreground lg:hidden">Input</h2>
             <div className="flex-1 bg-card border border-border rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-200">
-              <InputPanel onParse={handleParse} />
+              <InputPanel onParse={handleParse} inputText={inputText} />
             </div>
           </section>
 
@@ -98,6 +109,7 @@ export default function Home() {
                 onRename={renameNode}
                 onDelete={deleteNode}
                 onSelect={selectNode}
+                onAddNode={addNode}
                 selectedNodeId={state.selectedNodeId}
               />
             </div>

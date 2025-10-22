@@ -11,6 +11,7 @@ interface TreeViewProps {
   onRename?: (id: string, name: string) => void;
   onDelete?: (id: string) => void;
   onSelect?: (id: string) => void;
+  onAddNode?: (parentId: string, nodeType: 'file' | 'folder') => void;
   selectedNodeId?: string | null;
 }
 
@@ -19,7 +20,7 @@ interface TreeViewProps {
  * Provides ref for export functionality and handles empty state
  */
 export const TreeView = forwardRef<HTMLDivElement, TreeViewProps>(
-  ({ nodes, onToggleExpand, onRename, onDelete, onSelect, selectedNodeId }, ref) => {
+  ({ nodes, onToggleExpand, onRename, onDelete, onSelect, onAddNode, selectedNodeId }, ref) => {
     // Flatten tree for keyboard navigation
     const flattenNodes = useCallback((nodeList: TreeNodeType[]): TreeNodeType[] => {
       const result: TreeNodeType[] = [];
@@ -101,6 +102,7 @@ export const TreeView = forwardRef<HTMLDivElement, TreeViewProps>(
               onRename={onRename}
               onDelete={onDelete}
               onSelect={onSelect}
+              onAddNode={onAddNode}
               selectedNodeId={selectedNodeId}
             />
           ))}

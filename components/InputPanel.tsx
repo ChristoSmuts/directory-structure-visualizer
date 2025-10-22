@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
@@ -9,7 +9,8 @@ import { TreeNode } from '@/lib/types';
 import { AlertCircle, FileText } from 'lucide-react';
 
 interface InputPanelProps {
-  onParse: (nodes: TreeNode[]) => void;
+  onParse: (nodes: TreeNode[], text: string) => void;
+  inputText?: string;
 }
 
 const EXAMPLE_MARKDOWN = `- src/
@@ -30,11 +31,19 @@ const EXAMPLE_ASCII = `src/
 package.json
 README.md`;
 
-export function InputPanel({ onParse }: InputPanelProps) {
+export function InputPanel({ onParse, inputText = '' }: InputPanelProps) {
   const [input, setInput] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [showExamples, setShowExamples] = useState(true);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  // Sync input with external inputText prop
+  useEffect(() => {
+    if (inputText && inputText !== input) {
+      setInput(inputText);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [inputText]);
 
   const handleParse = () => {
     setError(null);
@@ -42,7 +51,7 @@ export function InputPanel({ onParse }: InputPanelProps) {
     const result = parseDirectoryStructure(input);
     
     if (result.success) {
-      onParse(result.nodes);
+      onParse(result.nodes, input);
       setShowExamples(false);
     } else {
       setError(result.error);

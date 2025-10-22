@@ -1,7 +1,7 @@
 'use client';
 
 import { TreeNode as TreeNodeType } from '@/lib/types';
-import { ChevronRight, ChevronDown, Folder, File, Pencil, Trash2, X, Check } from 'lucide-react';
+import { ChevronRight, ChevronDown, Folder, File, Pencil, Trash2, X, Check, FolderPlus, FilePlus } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useState, useRef, useEffect } from 'react';
 
@@ -11,6 +11,7 @@ interface TreeNodeProps {
   onRename?: (id: string, name: string) => void;
   onDelete?: (id: string) => void;
   onSelect?: (id: string) => void;
+  onAddNode?: (parentId: string, nodeType: 'file' | 'folder') => void;
   selectedNodeId?: string | null;
 }
 
@@ -20,6 +21,7 @@ export function TreeNode({
   onRename,
   onDelete,
   onSelect,
+  onAddNode,
   selectedNodeId,
 }: TreeNodeProps) {
   const [isEditing, setIsEditing] = useState(false);
@@ -123,6 +125,20 @@ export function TreeNode({
   const handleDeleteCancel = (e: React.MouseEvent) => {
     e.stopPropagation();
     setShowDeleteConfirm(false);
+  };
+
+  const handleAddFolder = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (onAddNode) {
+      onAddNode(node.id, 'folder');
+    }
+  };
+
+  const handleAddFile = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (onAddNode) {
+      onAddNode(node.id, 'file');
+    }
   };
 
   const handleEditComplete = () => {
@@ -295,6 +311,38 @@ export function TreeNode({
               {node.name}
             </span>
             
+            {/* Add folder button (only for folders) */}
+            {isFolder && (
+              <button
+                onClick={handleAddFolder}
+                className={cn(
+                  'opacity-0 group-hover:opacity-100 transition-opacity duration-200 cursor-pointer',
+                  'p-1.5 rounded-md hover:bg-accent-foreground/10',
+                  'focus:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring/50',
+                )}
+                aria-label="Add folder"
+                tabIndex={-1}
+              >
+                <FolderPlus className="w-3.5 h-3.5 text-muted-foreground hover:text-foreground transition-colors duration-200" />
+              </button>
+            )}
+            
+            {/* Add file button (only for folders) */}
+            {isFolder && (
+              <button
+                onClick={handleAddFile}
+                className={cn(
+                  'opacity-0 group-hover:opacity-100 transition-opacity duration-200 cursor-pointer',
+                  'p-1.5 rounded-md hover:bg-accent-foreground/10',
+                  'focus:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring/50',
+                )}
+                aria-label="Add file"
+                tabIndex={-1}
+              >
+                <FilePlus className="w-3.5 h-3.5 text-muted-foreground hover:text-foreground transition-colors duration-200" />
+              </button>
+            )}
+            
             {/* Edit button */}
             <button
               onClick={handleEditClick}
@@ -355,6 +403,7 @@ export function TreeNode({
               onRename={onRename}
               onDelete={onDelete}
               onSelect={onSelect}
+              onAddNode={onAddNode}
               selectedNodeId={selectedNodeId}
             />
           ))}

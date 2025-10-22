@@ -1,5 +1,5 @@
-import { useReducer } from 'react';
-import { TreeNode, TreeState, TreeAction } from '@/lib/types';
+import { useReducer } from "react";
+import { TreeNode, TreeState, TreeAction } from "@/lib/types";
 
 /**
  * Initial state for the tree
@@ -14,7 +14,7 @@ const initialState: TreeState = {
  */
 function toggleNodeExpand(nodes: TreeNode[], targetId: string): TreeNode[] {
   return nodes.map((node) => {
-    if (node.id === targetId && node.type === 'folder') {
+    if (node.id === targetId && node.type === "folder") {
       return {
         ...node,
         isExpanded: !node.isExpanded,
@@ -33,7 +33,11 @@ function toggleNodeExpand(nodes: TreeNode[], targetId: string): TreeNode[] {
 /**
  * Helper function to recursively rename a node
  */
-function renameNode(nodes: TreeNode[], targetId: string, newName: string): TreeNode[] {
+function renameNode(
+  nodes: TreeNode[],
+  targetId: string,
+  newName: string
+): TreeNode[] {
   return nodes.map((node) => {
     if (node.id === targetId) {
       return {
@@ -85,40 +89,87 @@ function findNodeById(nodes: TreeNode[], targetId: string): TreeNode | null {
 }
 
 /**
+ * Helper function to add a new node to a parent folder
+ */
+function addNodeToParent(
+  nodes: TreeNode[],
+  parentId: string,
+  nodeType: "file" | "folder"
+): TreeNode[] {
+  return nodes.map((node) => {
+    if (node.id === parentId && node.type === "folder") {
+      const children = node.children || [];
+      const newNodeName = nodeType === "folder" ? "New Folder" : "new-file.txt";
+      const newNode: TreeNode = {
+        id: `${Date.now()}-${Math.random()}`,
+        name: newNodeName,
+        type: nodeType,
+        depth: node.depth + 1,
+        children: nodeType === "folder" ? [] : undefined,
+        isExpanded: nodeType === "folder" ? false : undefined,
+      };
+      return {
+        ...node,
+        children: [...children, newNode],
+        isExpanded: true, // Auto-expand parent when adding child
+      };
+    }
+    if (node.children) {
+      return {
+        ...node,
+        children: addNodeToParent(node.children, parentId, nodeType),
+      };
+    }
+    return node;
+  });
+}
+
+/**
  * Reducer function for tree state management
  */
 function treeReducer(state: TreeState, action: TreeAction): TreeState {
   switch (action.type) {
-    case 'SET_TREE':
+    case "SET_TREE":
       return {
         ...state,
         nodes: action.payload,
         selectedNodeId: null,
       };
 
-    case 'TOGGLE_EXPAND':
+    case "TOGGLE_EXPAND":
       return {
         ...state,
         nodes: toggleNodeExpand(state.nodes, action.payload),
       };
 
-    case 'RENAME_NODE':
+    case "RENAME_NODE":
       return {
         ...state,
         nodes: renameNode(state.nodes, action.payload.id, action.payload.name),
       };
 
-    case 'DELETE_NODE':
+    case "DELETE_NODE":
       return {
         ...state,
         nodes: deleteNode(state.nodes, action.payload),
-        selectedNodeId: state.selectedNodeId === action.payload ? null : state.selectedNodeId,
+        selectedNodeId:
+          state.selectedNodeId === action.payload ? null : state.selectedNodeId,
       };
 
-    case 'SELECT_NODE':
+    case "SELECT_NODE":
       return {
         ...state,
         selectedNodeId: action.payload,
+      };
+
+    case "ADD_NODE":
+      return {
+        ...state,
+        nodes: addNodeToParent(
+          state.nodes,
+          action.payload.parentId,
+          action.payload.nodeType
+        ),
       };
 
     default:
@@ -136,35 +187,35 @@ export function useTreeState() {
    * Set the entire tree structure
    */
   const setTree = (nodes: TreeNode[]) => {
-    dispatch({ type: 'SET_TREE', payload: nodes });
+    dispatch({ type: "SET_TREE", payload: nodes });
   };
 
   /**
    * Toggle the expanded state of a folder node
    */
   const toggleExpand = (id: string) => {
-    dispatch({ type: 'TOGGLE_EXPAND', payload: id });
+    dispatch({ type: "TOGGLE_EXPAND", payload: id });
   };
 
   /**
    * Rename a node
    */
   const renameNodeById = (id: string, name: string) => {
-    dispatch({ type: 'RENAME_NODE', payload: { id, name } });
+    dispatch({ type: "RENAME_NODE", payload: { id, name } });
   };
 
   /**
    * Delete a node
    */
   const deleteNodeById = (id: string) => {
-    dispatch({ type: 'DELETE_NODE', payload: id });
+    dispatch({ type: "DELETE_NODE", payload: id });
   };
 
   /**
    * Select a node
    */
   const selectNode = (id: string | null) => {
-    dispatch({ type: 'SELECT_NODE', payload: id });
+    dispatch({ type: "SELECT_NODE", payload: id });
   };
 
   /**
@@ -172,6 +223,13 @@ export function useTreeState() {
    */
   const getNodeById = (id: string): TreeNode | null => {
     return findNodeById(state.nodes, id);
+  };
+
+  /**
+   * Add a new file or folder to a parent folder
+   */
+  const addNode = (parentId: string, nodeType: "file" | "folder") => {
+    dispatch({ type: "ADD_NODE", payload: { parentId, nodeType } });
   };
 
   return {
@@ -182,5 +240,6 @@ export function useTreeState() {
     deleteNode: deleteNodeById,
     selectNode,
     getNodeById,
+    addNode,
   };
 }
